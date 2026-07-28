@@ -1,6 +1,5 @@
 --- 
-- plugin: aws_ec2
-  hosts: all
+- hosts: all
   become: yes
   vars:
     docker_secret_name: dockerhub-credentials
