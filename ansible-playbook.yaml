@@ -1,0 +1,8 @@
+--- 
+- name: Deploy War file to Remote Machines in Container
+  hosts: all
+  tasks: 
+    - name: Copy War file to tomcat webapps directory in a container
+      shell: docker run -d --name 8am_java_webapp_container -p 1234:8000 dipanshur/8am_java_webapp_image 
+
+      
