@@ -29,6 +29,5 @@
     - name: login to Docker registry securely
       ansible.builtin.shell: |
         echo "{{ docker_password }}" | docker login --username "{{ docker_username }}" --password-stdin
-      no_log: true
 
       
