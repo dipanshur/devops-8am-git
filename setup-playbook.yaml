@@ -24,15 +24,16 @@
         append: yes
 
     - name: fetch docker credentials from AWS Secrets Manager
-      community.aws.aws_secret_info:
-        name: "{{ docker_secret_name }}"
-      register: docker_secret
+      ansible.builtin.command:
+        cmd: aws secretsmanager get-secret-value --secret-id "{{ docker_secret_name }}" --query SecretString --output text
+      register: docker_secret_cli
       delegate_to: localhost
       run_once: true
+      changed_when: false
 
     - name: set docker login variables from secret
       set_fact:
-        docker_creds: "{{ docker_secret.secrets[0].SecretString | from_json }}"
+        docker_creds: "{{ docker_secret_cli.stdout | from_json }}"
         docker_username: "{{ docker_creds.username | default(docker_creds.docker_username) }}"
         docker_password: "{{ docker_creds.password | default(docker_creds.docker_password) }}"
       no_log: true
