@@ -3,7 +3,10 @@
   become: yes
   vars:
     docker_secret_name: dockerhub-credentials
-
+    docker_secret_json: "{{ lookup('pipe', 'aws secretsmanager get-secret-value --secret-id ' ~ docker_secret_name ~ ' --query SecretString --output text') }}"
+    docker_creds: "{{ docker_secret_json | from_json }}"
+    docker_username: "{{ docker_creds.docker_username | default(docker_creds.username) }}"
+    docker_password: "{{ docker_creds.docker_password | default(docker_creds.password) }}"
 
   tasks: 
     - name: install docker
@@ -22,21 +25,6 @@
         name: abc
         groups: docker
         append: yes
-
-    - name: fetch docker credentials from AWS Secrets Manager
-      ansible.builtin.command:
-        cmd: aws secretsmanager get-secret-value --secret-id "{{ docker_secret_name }}" --query SecretString --output text
-      register: docker_secret_cli
-      delegate_to: localhost
-      run_once: true
-      changed_when: false
-
-    - name: set docker login variables from secret
-      set_fact:
-        docker_creds: "{{ docker_secret_cli.stdout | from_json }}"
-        docker_username: "{{ docker_creds.get('docker_username') | default(docker_creds.get('username')) }}"
-        docker_password: "{{ docker_creds.get('docker_password') | default(docker_creds.get('password')) }}"
-      no_log: true
 
     - name: login to Docker registry securely
       ansible.builtin.shell: |
