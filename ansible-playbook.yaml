@@ -3,6 +3,7 @@
   hosts: all
   tasks: 
     - name: Copy War file to tomcat webapps directory in a container
+      shell: docker stop docker rm 8am_java_webapp_container
       shell: docker rm 8am_java_webapp_container
       shell: docker run -d --name 8am_java_webapp_container -p 1234:8080 dipanshur/8am_java_webapp_image 
 
