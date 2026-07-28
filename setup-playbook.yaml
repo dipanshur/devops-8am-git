@@ -11,6 +11,7 @@
         name: docker
         state: present
 
+    - name: start and enable docker service
       service: 
         name: docker
         state: started
@@ -32,8 +33,8 @@
     - name: set docker login variables from secret
       set_fact:
         docker_creds: "{{ docker_secret.secrets[0].SecretString | from_json }}"
-        docker_username: "{{ docker_creds.username }}"
-        docker_password: "{{ docker_creds.password }}"
+        docker_username: "{{ docker_creds.username | default(docker_creds.docker_username) }}"
+        docker_password: "{{ docker_creds.password | default(docker_creds.docker_password) }}"
       no_log: true
 
     - name: login to Docker registry securely
